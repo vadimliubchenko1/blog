@@ -137,8 +137,36 @@ class PostRepository
      */
     public function getSimilarPosts(int $currentPostId, array $categoryIds, int $limit = 3): array
     {
-        // TODO: implement shared-category intersection query
-        return [];
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($categoryIds), '?'));
+
+        $sql = "
+            SELECT p.*, COUNT(pc.category_id) AS matched_categories
+            FROM posts p
+            INNER JOIN post_categories pc ON p.id = pc.post_id
+            WHERE pc.category_id IN ({$placeholders})
+              AND p.id != ?
+            GROUP BY p.id
+            ORDER BY matched_categories DESC, p.published_at DESC
+            LIMIT ?
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $paramIndex = 1;
+        foreach ($categoryIds as $catId) {
+            $stmt->bindValue($paramIndex++, (int)$catId, PDO::PARAM_INT);
+        }
+        $stmt->bindValue($paramIndex++, $currentPostId, PDO::PARAM_INT);
+        $stmt->bindValue($paramIndex, $limit, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $posts = $stmt->fetchAll();
+
+        return $this->attachCategories($posts);
     }
 
     /**
