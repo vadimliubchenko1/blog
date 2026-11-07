@@ -49,7 +49,7 @@ class Router
 
             if (preg_match($route['regex'], $path, $matches)) {
                 // Extract only named parameters
-                $params = $matches; // TODO: filter named params only
+                $params = array_filter($matches, static fn($key) => is_string($key), ARRAY_FILTER_USE_KEY);
 
                 $handler = $route['handler'];
 
