@@ -61,6 +61,8 @@ class PostAdminController
 
             if ($title === '' || $description === '' || $content === '') {
                 $error = 'Пожалуйста, заполните все обязательные поля (название, описание, текст).';
+            } elseif (empty($selectedCategories)) {
+                $error = 'Выберите хотя бы одну категорию для статьи.';
             } else {
                 if ($slug === '') {
                     $slug = $this->generateSlug($title);
