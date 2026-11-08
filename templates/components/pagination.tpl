@@ -13,7 +13,7 @@
             {* Page numbers *}
             {for $p = 1 to $pagination.totalPages}
                 {if $p == $pagination.currentPage}
-                    <li class="page-item">
+                    <li class="page-item active" aria-current="page">
                         <span class="page-link">{$p}</span>
                     </li>
                 {elseif $p == 1 || $p == $pagination.totalPages || ($p >= $pagination.currentPage - 2 && $p <= $pagination.currentPage + 2)}
